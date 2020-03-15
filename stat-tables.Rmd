@@ -3,16 +3,49 @@
 # author: "Haziq Jamil"
 # date: "15/03/2020"
 output: pdf_document
+header-includes:
+- \usepackage{hyperref}
 ---
 
 ```{r setup, include = FALSE}
+library(knitr)
 library(tidyverse)
 library(kableExtra)
 library(iprior)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-### Table 1: Cumulative Probabilities of the Standard Normal Distribution.
+\thispagestyle{empty}
+\begin{center}
+~\\
+\vspace{2cm}
+{\Huge Statistical Tables}
+\vspace{5cm}
+\end{center}
+
+```{r, fig.height = 3, fig.width = 6,out.width = "\\textwidth", warning = FALSE, fig.align = "center"}
+x <- seq(-3, 3, length = 3000)
+y <- dnorm(x)
+dat <- tibble(x, y)
+ggplot(dat, aes(x, y)) +
+  # geom_line() +
+  geom_ribbon(aes(ymax = y, ymin = 0), alpha = 0.5, col = NA) +
+  geom_col(aes(fill = x)) +
+  scale_fill_gradientn(colours = iprior::gg_col_hue(10)[c(4:10, 1:3)]) +
+  theme_void() +
+  theme(legend.position = "none")
+```
+
+\vfill
+\begin{center}
+Copyright (c) 2020 Haziq Jamil
+~\\
+\href{https://github.com/haziqj/stat-tables}{\texttt{https://github.com/haziqj/stat-tables}}
+\end{center}
+
+\newpage
+
+### Table 1: Cumulative probabilities of the standard normal distribution.
 
 Each table entry is the area $A$ under the standard normal curve from $-\infty$ to $z(\alpha)$.
 
@@ -39,8 +72,6 @@ ggplot(dat, aes(x, y)) +
         axis.text.x = element_text(size = 20))
 ```
 
-
-
 ```{r normtab}
 u <- seq(0, 3.49 , by = 0.01)
 p <- pnorm(u)
@@ -60,6 +91,28 @@ kable(m, booktabs = TRUE) %>%
 ### Table 2: Percentiles of the $\chi^2$ distribution.
 
 Each table entry is $\chi^2_k(\alpha)$, where $\text{P}\big(X < \chi^2_k(\alpha)\big)=A$ with $X\sim\chi^2_k$.
+\vspace{0.5em}
+```{r, fig.height = 2.7, fig.width = 6, out.width = "6cm", warning = FALSE, fig.align = "center"}
+x <- seq(0, 10, length = 250)
+y <- dchisq(x, df = 3.3)
+dat <- tibble(x, y)
+ggplot(dat, aes(x, y)) +
+  geom_line() +
+  geom_ribbon(data = subset(dat , x <= 6), aes(ymax = y),
+              ymin = 0, fill = iprior::gg_col_hue(1), colour = NA,
+              alpha = 0.5) +
+  geom_line(data = tibble(xx = c(6, 6), yy = c(0, dchisq(6, 3.3))),
+            aes(xx, yy), linetype = "dashed") +
+  annotate("text", x = 2.3, y = 0.08, size = 8, label = "A") +
+  labs(x = NULL, y = NULL) +
+  scale_x_continuous(breaks = c(0, 6), 
+                     labels = c(0, expression(chi[k]^2 ~(alpha)))) +
+  theme_classic() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+        axis.text.x = element_text(size = 20))
+```
+
+\vspace{-0.5em}
 
 ```{r chisqtab}
 u <- c(0.005, 0.010, 0.025, 0.050, 0.100, 0.900, 0.950, 0.975, 0.990, 0.995)
@@ -69,11 +122,104 @@ for (i in seq_along(k)) {
   m[i, ] <- qchisq(u, df = k[i])
 }
 colnames(m) <- iprior::dec_plac(u, 3)
-rownames(m) <- k
+# rownames(m) <- k
+m <- cbind("$k$" = k, iprior::dec_plac(m, 3))
+m[1, 2] <- "$0.0^4393$"
+m[1, 3] <- "$0.0^3157$"
+m[1, 4] <- "$0.0^3982$"
+m[1, 5] <- "$0.0^2393$"
+# m[1, 6] <- "$0.0158$"
 
 options(digits = 4)
-kable(iprior::dec_plac(m, 3), booktabs = TRUE) %>%
-  kable_styling(position = "center")
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE, 
+      align = c("l", rep("r", length(u)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$A$" = 10), escape = FALSE)
 ```
 
+### Table 3: Percentiles of Student's $t$-distribution.
+
+Each table entry is $t_k(\alpha)$, where $\text{P}\big(X < t_k(\alpha)\big)=A$ with $X\sim t_k$.
+
+\vspace{1em}
+
+```{r, fig.height = 3, fig.width = 6,out.width = "6cm", warning = FALSE, fig.align = "center"}
+x <- seq(-3, 3, length = 200)
+y <- dt(x, df = 1)
+dat <- tibble(x, y)
+ggplot(dat, aes(x, y)) +
+  geom_line() +
+  geom_ribbon(data = subset(dat , x >= -3 & x <= 0.8), aes(ymax = y),
+              ymin = 0, fill = iprior::gg_col_hue(1), colour = NA,
+              alpha = 0.5) +
+  geom_line(data = tibble(xx = c(0.8, 0.8), yy = c(0, dt(0.8, 1))),
+            aes(xx, yy), linetype = "dashed") +
+  annotate("text", x = -0.25, y = 0.13, size = 8, label = "A") +
+  labs(x = NULL, y = NULL) +
+  scale_x_continuous(breaks = 0.8, labels = expression(t[k]~(alpha) )) +
+  theme_classic() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+        axis.text.x = element_text(size = 20))
+```
+
+```{r ttab}
+u <- c(0.60, 0.70, 0.80, 0.85, 0.90, 0.95, 0.975, 0.99, 0.9925, 0.995, 0.9975, 0.9995)
+k <- c(seq(1, 30, by = 1), c(40, 60, 120, Inf))
+m <- data.frame(matrix(NA, ncol = length(u), nrow = length(k)))
+for (i in seq_along(k)) {
+  m[i, ] <- qt(u, df = k[i])
+}
+colnames(m) <- c(
+  iprior::dec_plac(c(0.60, 0.70, 0.80, 0.85, 0.90, 0.95), 2),
+  iprior::dec_plac(c(0.975, 0.99), 3),
+  iprior::dec_plac(c(0.9925, 0.995, 0.9975, 0.9995), 4)
+)
+m <- cbind("$k$" = k, iprior::dec_plac(m, 3))
+m[nrow(m), 1] <- "$\\infty$"
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE, 
+      align = c("l", rep("r", length(u)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$A$" = length(u)), escape = FALSE)
+```
+
+### Table 3: Percentiles of the $F$-distribution.
+
+```{r ftab}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- 1:10
+k2 <- 1:3
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 1
+m[1, ] <- iprior::dec_plac(tmp[1, ], 2)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 1)
+m[3:7, ] <- round(tmp[3:7, ])
+
+# k2 = 2
+m[8:9, ]   <- iprior::dec_plac(tmp[8:9, ], 2)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 1)
+
+# k2 = 3
+m[15:17, ] <- iprior::dec_plac(tmp[15:17, ], 2)
+m[18:21, ] <- iprior::dec_plac(tmp[18:21, ], 1)
+
+colnames(m) <- k1
+m <- cbind(" " = uk2[, 1], m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE, digits = 3,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  pack_rows("$k_2=1$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=2$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=3$", 15, 21, escape = FALSE) 
+```
 
