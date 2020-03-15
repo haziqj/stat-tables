@@ -1,0 +1,79 @@
+---
+# title: "Statistical Tables"
+# author: "Haziq Jamil"
+# date: "15/03/2020"
+output: pdf_document
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(kableExtra)
+library(iprior)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+### Table 1: Cumulative Probabilities of the Standard Normal Distribution.
+
+Each table entry is the area $A$ under the standard normal curve from $-\infty$ to $z(\alpha)$.
+
+\vspace{1em}
+
+```{r, fig.height = 3, fig.width = 6,out.width = "6cm", warning = FALSE, fig.align = "center"}
+x <- seq(-3, 3, length = 200)
+y <- dnorm(x)
+dat <- tibble(x, y)
+ggplot(dat, aes(x, y)) +
+  geom_line() +
+  geom_ribbon(data = subset(dat , x >= -3 & x <= 0.8), aes(ymax = y),
+              ymin = 0, fill = iprior::gg_col_hue(1), colour = NA,
+              alpha = 0.5) +
+  geom_line(data = tibble(xx = c(0.8, 0.8), yy = c(0, dnorm(0.8))),
+            aes(xx, yy), linetype = "dashed") +
+  # annotate("text", x = -0.25, y = 0.17, size = 5, 
+  #          label = expression("A ="~P (Z<z[alpha]) )  ) +
+  annotate("text", x = -0.25, y = 0.17, size = 8, label = "A") +
+  labs(x = NULL, y = NULL) +
+  scale_x_continuous(breaks = 0.8, labels = expression(z(alpha))) +
+  theme_classic() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+        axis.text.x = element_text(size = 20))
+```
+
+
+
+```{r normtab}
+u <- seq(0, 3.49 , by = 0.01)
+p <- pnorm(u)
+m <- data.frame(matrix(p, ncol = 10, byrow = TRUE))
+colnames(m) <- c(
+  gsub("0.0", ".0", iprior::dec_plac(seq(0, 0.09, by = 0.01), 2))
+)
+rownames(m) <- c(
+  iprior::dec_plac(seq(0, 3.4, by = 0.1), 1)
+)
+
+options(digits = 4)
+kable(m, booktabs = TRUE) %>%
+  kable_styling(position = "center")
+```
+
+### Table 2: Percentiles of the $\chi^2$ distribution.
+
+Each table entry is $\chi^2_k(\alpha)$, where $\text{P}\big(X < \chi^2_k(\alpha)\big)=A$ with $X\sim\chi^2_k$.
+
+```{r chisqtab}
+u <- c(0.005, 0.010, 0.025, 0.050, 0.100, 0.900, 0.950, 0.975, 0.990, 0.995)
+k <- c(seq(1, 29, by = 1), seq(30, 100, by = 10))
+m <- data.frame(matrix(NA, ncol = length(u), nrow = length(k)))
+for (i in seq_along(k)) {
+  m[i, ] <- qchisq(u, df = k[i])
+}
+colnames(m) <- iprior::dec_plac(u, 3)
+rownames(m) <- k
+
+options(digits = 4)
+kable(iprior::dec_plac(m, 3), booktabs = TRUE) %>%
+  kable_styling(position = "center")
+```
+
+
