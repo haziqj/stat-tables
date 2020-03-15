@@ -91,7 +91,7 @@ kable(m, booktabs = TRUE) %>%
   kable_styling(position = "center")
 ```
 
-### Table 2: Percentiles of the $\chi^2$ distribution.
+### Table 2: Percentiles of the $\chi^2$-distribution.
 
 Each table entry is $\chi^2_k(\alpha)$, where $\text{P}\big(X < \chi^2_k(\alpha)\big)=A=1-\alpha$ with $X\sim\chi^2_k$.
 \vspace{0.5em}
