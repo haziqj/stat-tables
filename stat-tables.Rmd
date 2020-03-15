@@ -2,7 +2,9 @@
 # title: "Statistical Tables"
 # author: "Haziq Jamil"
 # date: "15/03/2020"
-output: pdf_document
+output: 
+  pdf_document: 
+    keep_tex: yes
 header-includes:
 - \usepackage{hyperref}
 ---
@@ -47,7 +49,7 @@ Copyright (c) 2020 Haziq Jamil
 
 ### Table 1: Cumulative probabilities of the standard normal distribution.
 
-Each table entry is the area $A$ under the standard normal curve from $-\infty$ to $z(\alpha)$.
+Each table entry is the area $A=1-\alpha$ under the standard normal curve from $-\infty$ to $z(\alpha)$.
 
 \vspace{1em}
 
@@ -90,7 +92,7 @@ kable(m, booktabs = TRUE) %>%
 
 ### Table 2: Percentiles of the $\chi^2$ distribution.
 
-Each table entry is $\chi^2_k(\alpha)$, where $\text{P}\big(X < \chi^2_k(\alpha)\big)=A$ with $X\sim\chi^2_k$.
+Each table entry is $\chi^2_k(\alpha)$, where $\text{P}\big(X < \chi^2_k(\alpha)\big)=A=1-\alpha$ with $X\sim\chi^2_k$.
 \vspace{0.5em}
 ```{r, fig.height = 2.7, fig.width = 6, out.width = "6cm", warning = FALSE, fig.align = "center"}
 x <- seq(0, 10, length = 250)
@@ -139,7 +141,7 @@ kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
 
 ### Table 3: Percentiles of Student's $t$-distribution.
 
-Each table entry is $t_k(\alpha)$, where $\text{P}\big(X < t_k(\alpha)\big)=A$ with $X\sim t_k$.
+Each table entry is $t_k(\alpha)$, where $\text{P}\big(X < t_k(\alpha)\big)=A=1-\alpha$ with $X\sim t_k$.
 
 \vspace{1em}
 
@@ -183,12 +185,35 @@ kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
   add_header_above(c(" ", "$A$" = length(u)), escape = FALSE)
 ```
 
-### Table 3: Percentiles of the $F$-distribution.
-
-```{r ftab}
+### Table 3.1: Percentiles of the $F$-distribution.
+\vspace{-0.4em}
+Each table entry is $F_{k_1,k_2}(\alpha) = F_{k_2,k_1}^{-1}(1-\alpha)$, where $\text{P}\big(X < F_{k_1,k_2}(\alpha)\big)=A=1-\alpha$ with $X\sim F_{k_1,k_2}$.
+<!-- Remark: $F_{k_1,k_2}(\alpha) = F_{k_2,k_1}^{-1}(1-\alpha)$. -->
+<!-- \vspace{-0.5em} -->
+```{r, fig.height = 2.6, fig.width = 6,out.width = "6cm", warning = FALSE, fig.align = "center"}
+x <- seq(0, 10, length = 250)
+y <- df(x, df1 = 10, df2 = 2)
+dat <- tibble(x, y)
+ggplot(dat, aes(x, y)) +
+  geom_line() +
+  geom_ribbon(data = subset(dat , x <= 6), aes(ymax = y),
+              ymin = 0, fill = iprior::gg_col_hue(1), colour = NA,
+              alpha = 0.5) +
+  geom_line(data = tibble(xx = c(6, 6), yy = c(0, df(6, 10, 2))),
+            aes(xx, yy), linetype = "dashed") +
+  annotate("text", x = 1.3, y = 0.1, size = 8, label = "A") +
+  labs(x = NULL, y = NULL) +
+  scale_x_continuous(breaks = c(0, 6), 
+                     labels = c(0, expression(F[k[1]~","~k[2]] ~(alpha)))) +
+  theme_classic() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+        axis.text.x = element_text(size = 20))
+```
+\vspace{-0.6em}
+```{r ftab1}
 u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
 k1 <- 1:10
-k2 <- 1:3
+k2 <- 1:5
 uk2 <- expand.grid(u, k2)
 m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
 for (i in seq_len(nrow(uk2))) {
@@ -211,15 +236,396 @@ m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 1)
 m[15:17, ] <- iprior::dec_plac(tmp[15:17, ], 2)
 m[18:21, ] <- iprior::dec_plac(tmp[18:21, ], 1)
 
-colnames(m) <- k1
-m <- cbind(" " = uk2[, 1], m)
+# k2 = 4
+m[22:23, ] <- iprior::dec_plac(tmp[22:23, ], 2)
+m[24:28, ] <- iprior::dec_plac(tmp[24:28, ], 1)
 
-kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE, digits = 3,
+# k2 = 5
+m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 2)
+m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 1)
+
+colnames(m) <- k1
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
       align = c("l", rep("r", length(k1)))) %>%
   kable_styling(position = "center")  %>%
   add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
   pack_rows("$k_2=1$", 1, 7, escape = FALSE) %>%
   pack_rows("$k_2=2$", 8, 14, escape = FALSE) %>%
-  pack_rows("$k_2=3$", 15, 21, escape = FALSE) 
+  pack_rows("$k_2=3$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=4$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=5$", 29, 35, escape = FALSE)
 ```
+
+### Table 3.2: (Continued) Percentiles of the $F$-distribution.
+
+
+```{r ftab2}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- c(11, 12, 13, 14, 15, 20, 30, 60, 120, Inf)
+k2 <- 1:5
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 1
+m[1, ] <- iprior::dec_plac(tmp[1, ], 2)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 1)
+m[3:7, ] <- round(tmp[3:7, ])
+
+# k2 = 2
+m[8:9, ]   <- iprior::dec_plac(tmp[8:9, ], 2)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 1)
+
+# k2 = 3
+m[15:17, ] <- iprior::dec_plac(tmp[15:17, ], 2)
+m[18:21, ] <- iprior::dec_plac(tmp[18:21, ], 1)
+
+# k2 = 4
+m[22:23, ] <- iprior::dec_plac(tmp[22:23, ], 2)
+m[24:28, ] <- iprior::dec_plac(tmp[24:28, ], 1)
+
+# k2 = 5
+m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 2)
+m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 1)
+
+colnames(m) <- k1
+colnames(m)[10] <- "$\\infty$"
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
+  pack_rows("$k_2=1$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=2$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=3$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=4$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=5$", 29, 35, escape = FALSE)
+```
+
+### Table 3.3: (Continued) Percentiles of the $F$-distribution.
+
+```{r ftab3}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- 1:10
+k2 <- 6:10
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 6
+m[1, ] <- iprior::dec_plac(tmp[1, ], 3)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 2)
+m[3:7, ] <- iprior::dec_plac(tmp[3:7, ], 2)
+
+# k2 = 7
+m[8, ]   <- iprior::dec_plac(tmp[8, ], 3)
+m[9, ]   <- iprior::dec_plac(tmp[9, ], 2)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
+
+# k2 = 8
+m[15, ] <- iprior::dec_plac(tmp[15, ], 3)
+m[16:21, ] <- iprior::dec_plac(tmp[16:21, ], 2)
+
+# k2 = 9
+m[22, ] <- iprior::dec_plac(tmp[22, ], 3)
+m[23:28, ] <- iprior::dec_plac(tmp[23:28, ], 2)
+
+# k2 = 10
+m[29, ] <- iprior::dec_plac(tmp[29, ], 3)
+m[30:35, ] <- iprior::dec_plac(tmp[30:35, ], 2)
+
+colnames(m) <- k1
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
+  pack_rows("$k_2=6$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=7$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=8$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=9$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=10$", 29, 35, escape = FALSE)
+```
+
+### Table 3.4: (Continued) Percentiles of the $F$-distribution.
+
+```{r ftab4}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- c(11, 12, 13, 14, 15, 20, 30, 60, 120, Inf)
+k2 <- 6:10
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 6
+m[1, ] <- iprior::dec_plac(tmp[1, ], 3)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 3)
+m[3:7, ] <- iprior::dec_plac(tmp[3:7, ], 2)
+
+# k2 = 7
+m[8, ]   <- iprior::dec_plac(tmp[8, ], 3)
+m[9, ]   <- iprior::dec_plac(tmp[9, ], 3)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
+
+# k2 = 8
+m[15, ] <- iprior::dec_plac(tmp[15, ], 3)
+m[16:21, ] <- iprior::dec_plac(tmp[16:21, ], 2)
+
+# k2 = 9
+m[22, ] <- iprior::dec_plac(tmp[22, ], 3)
+m[23:28, ] <- iprior::dec_plac(tmp[23:28, ], 2)
+
+# k2 = 10
+m[29, ] <- iprior::dec_plac(tmp[29, ], 3)
+m[30:35, ] <- iprior::dec_plac(tmp[30:35, ], 2)
+
+colnames(m) <- k1
+colnames(m)[10] <- "$\\infty$"
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
+  pack_rows("$k_2=6$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=7$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=8$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=9$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=10$", 29, 35, escape = FALSE)
+```
+
+### Table 3.5: (Continued) Percentiles of the $F$-distribution.
+
+```{r ftab5}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- 1:10
+k2 <- c(11, 12, 13, 14, 15)
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 6
+m[1, ] <- iprior::dec_plac(tmp[1, ], 3)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 2)
+m[3:7, ] <- iprior::dec_plac(tmp[3:7, ], 2)
+
+# k2 = 7
+m[8, ]   <- iprior::dec_plac(tmp[8, ], 3)
+m[9, ]   <- iprior::dec_plac(tmp[9, ], 2)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
+
+# k2 = 8
+m[15, ] <- iprior::dec_plac(tmp[15, ], 3)
+m[16:21, ] <- iprior::dec_plac(tmp[16:21, ], 2)
+
+# k2 = 9
+m[22, ] <- iprior::dec_plac(tmp[22, ], 3)
+m[23:28, ] <- iprior::dec_plac(tmp[23:28, ], 2)
+
+# k2 = 10
+m[29, ] <- iprior::dec_plac(tmp[29, ], 3)
+m[30:35, ] <- iprior::dec_plac(tmp[30:35, ], 2)
+
+colnames(m) <- k1
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
+  pack_rows("$k_2=11$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=12$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=13$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=14$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=15$", 29, 35, escape = FALSE)
+```
+
+### Table 3.6: (Continued) Percentiles of the $F$-distribution.
+
+```{r ftab6}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- c(11, 12, 13, 14, 15, 20, 30, 60, 120, Inf)
+k2 <- c(11, 12, 13, 14, 15)
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 6
+m[1, ] <- iprior::dec_plac(tmp[1, ], 3)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 3)
+m[3:7, ] <- iprior::dec_plac(tmp[3:7, ], 2)
+
+# k2 = 7
+m[8, ]   <- iprior::dec_plac(tmp[8, ], 3)
+m[9, ]   <- iprior::dec_plac(tmp[9, ], 3)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
+
+# k2 = 8
+m[15:16, ] <- iprior::dec_plac(tmp[15:16, ], 3)
+m[17:21, ] <- iprior::dec_plac(tmp[17:21, ], 2)
+
+# k2 = 9
+m[22:23, ] <- iprior::dec_plac(tmp[22:23, ], 3)
+m[24:28, ] <- iprior::dec_plac(tmp[24:28, ], 2)
+
+# k2 = 10
+m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 3)
+m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 2)
+
+colnames(m) <- k1
+colnames(m)[10] <- "$\\infty$"
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
+  pack_rows("$k_2=11$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=12$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=13$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=14$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=15$", 29, 35, escape = FALSE)
+```
+
+
+### Table 3.7: (Continued) Percentiles of the $F$-distribution.
+
+```{r ftab7}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- 1:10
+k2 <- c(20, 30, 60, 120, Inf)
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 6
+m[1, ] <- iprior::dec_plac(tmp[1, ], 3)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 2)
+m[3:7, ] <- iprior::dec_plac(tmp[3:7, ], 2)
+
+# k2 = 7
+m[8, ]   <- iprior::dec_plac(tmp[8, ], 3)
+m[9, ]   <- iprior::dec_plac(tmp[9, ], 2)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
+
+# k2 = 8
+m[15, ] <- iprior::dec_plac(tmp[15, ], 3)
+m[16:21, ] <- iprior::dec_plac(tmp[16:21, ], 2)
+
+# k2 = 9
+m[22, ] <- iprior::dec_plac(tmp[22, ], 3)
+m[23:28, ] <- iprior::dec_plac(tmp[23:28, ], 2)
+
+# k2 = 10
+m[29, ] <- iprior::dec_plac(tmp[29, ], 3)
+m[30:35, ] <- iprior::dec_plac(tmp[30:35, ], 2)
+
+colnames(m) <- k1
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
+  pack_rows("$k_2=20$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=30$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=60$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=120$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=\\infty$", 29, 35, escape = FALSE)
+```
+
+### Table 3.8: (Continued) Percentiles of the $F$-distribution.
+
+```{r ftab8}
+u <- c(0.5, 0.9, 0.95, 0.975, 0.99, 0.995, 0.999)
+k1 <- c(11, 12, 13, 14, 15, 20, 30, 60, 120, Inf)
+k2 <- c(20, 30, 60, 120, Inf)
+uk2 <- expand.grid(u, k2)
+m <- data.frame(matrix(NA, ncol = length(k1), nrow = nrow(uk2)))
+for (i in seq_len(nrow(uk2))) {
+  for (j in seq_along(k1)) {
+    m[i, j] <- qf(uk2[i, 1], df1 = k1[j], df2 = uk2[i, 2])
+  }
+}
+tmp <- m
+
+# k2 = 6
+m[1, ] <- iprior::dec_plac(tmp[1, ], 3)
+m[2, ] <- iprior::dec_plac(tmp[2, ], 3)
+m[3:7, ] <- iprior::dec_plac(tmp[3:7, ], 2)
+
+# k2 = 7
+m[8, ]   <- iprior::dec_plac(tmp[8, ], 3)
+m[9, ]   <- iprior::dec_plac(tmp[9, ], 3)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
+
+# k2 = 8
+m[15:16, ] <- iprior::dec_plac(tmp[15:16, ], 3)
+m[17:21, ] <- iprior::dec_plac(tmp[17:21, ], 2)
+
+# k2 = 9
+m[22:23, ] <- iprior::dec_plac(tmp[22:23, ], 3)
+m[24:28, ] <- iprior::dec_plac(tmp[24:28, ], 2)
+
+# k2 = 10
+m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 3)
+m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 2)
+
+colnames(m) <- k1
+colnames(m)[10] <- "$\\infty$"
+m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
+
+kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", rep("r", length(k1)))) %>%
+  kable_styling(position = "center")  %>%
+  add_header_above(c(" ", "$k_1$" = length(k1)), escape = FALSE) %>%
+  # collapse_rows(1, latex_hline = "none", row_group_label_position = "stack")
+  pack_rows("$k_2=20$", 1, 7, escape = FALSE) %>%
+  pack_rows("$k_2=30$", 8, 14, escape = FALSE) %>%
+  pack_rows("$k_2=60$", 15, 21, escape = FALSE) %>%
+  pack_rows("$k_2=120$", 22, 28, escape = FALSE) %>%
+  pack_rows("$k_2=\\int$", 29, 35, escape = FALSE, bold = FALSE)
+```
+
 
