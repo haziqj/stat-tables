@@ -1,12 +1,11 @@
 ---
-# title: "Statistical Tables"
-# author: "Haziq Jamil"
-# date: "15/03/2020"
-output: 
-  pdf_document: 
-    keep_tex: yes
 header-includes:
 - \usepackage{hyperref}
+- \usepackage{graphicx}
+- \graphicspath{{stat-tables_files/figure-latex/}}
+output:
+  pdf_document:
+    keep_tex: yes
 ---
 
 ```{r setup, include = FALSE}
@@ -22,6 +21,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ~\\
 \vspace{2cm}
 {\Huge Statistical Tables}
+~\\~\\
+v0.1 (last updated: 15 Mar 2020)
 \vspace{5cm}
 \end{center}
 
@@ -625,7 +626,7 @@ kable(m, booktabs = TRUE, row.names = FALSE, escape = FALSE,
   pack_rows("$k_2=30$", 8, 14, escape = FALSE) %>%
   pack_rows("$k_2=60$", 15, 21, escape = FALSE) %>%
   pack_rows("$k_2=120$", 22, 28, escape = FALSE) %>%
-  pack_rows("$k_2=\\int$", 29, 35, escape = FALSE, bold = FALSE)
+  pack_rows("$k_2=\\infty$", 29, 35, escape = FALSE, bold = FALSE)
 ```
 
 
