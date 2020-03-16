@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = FALSE)
 \vspace{2cm}
 {\Huge Statistical Tables}
 ~\\~\\
-v0.1 (last updated: 15 Mar 2020)
+v0.1.1 (last updated: 16 Mar 2020)
 \vspace{5cm}
 \end{center}
 
@@ -43,7 +43,7 @@ ggplot(dat, aes(x, y)) +
 \begin{center}
 Copyright (c) 2020 Haziq Jamil
 ~\\
-\href{https://github.com/haziqj/stat-tables}{\texttt{https://github.com/haziqj/stat-tables}}
+\href{https://haziqj.github.io/stat-tables}{\texttt{https://haziqj.github.io/stat-tables}}
 \end{center}
 
 \newpage
@@ -225,25 +225,28 @@ for (i in seq_len(nrow(uk2))) {
 tmp <- m
 
 # k2 = 1
-m[1, ] <- iprior::dec_plac(tmp[1, ], 2)
+m[1, ] <- iprior::dec_plac(tmp[1, ], 3)
 m[2, ] <- iprior::dec_plac(tmp[2, ], 1)
 m[3:7, ] <- round(tmp[3:7, ])
 
 # k2 = 2
-m[8:9, ]   <- iprior::dec_plac(tmp[8:9, ], 2)
-m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 1)
+m[8:9, ]   <- iprior::dec_plac(tmp[8:9, ], 3)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
 
 # k2 = 3
-m[15:17, ] <- iprior::dec_plac(tmp[15:17, ], 2)
-m[18:21, ] <- iprior::dec_plac(tmp[18:21, ], 1)
+m[15:17, ] <- iprior::dec_plac(tmp[15:17, ], 3)
+m[18:19, ] <- iprior::dec_plac(tmp[18:19, ], 2)
+m[20:21, ] <- iprior::dec_plac(tmp[20:21, ], 1)
 
 # k2 = 4
-m[22:23, ] <- iprior::dec_plac(tmp[22:23, ], 2)
-m[24:28, ] <- iprior::dec_plac(tmp[24:28, ], 1)
+m[22, ] <- iprior::dec_plac(tmp[22, ], 3)
+m[23:25, ] <- iprior::dec_plac(tmp[23:25, ], 2)
+m[26:28, ] <- iprior::dec_plac(tmp[26:28, ], 1)
 
 # k2 = 5
-m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 2)
-m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 1)
+m[29, ] <- iprior::dec_plac(tmp[29, ], 3)
+m[30:32, ] <- iprior::dec_plac(tmp[30:32, ], 2)
+m[33:35, ] <- iprior::dec_plac(tmp[33:35, ], 1)
 
 colnames(m) <- k1
 m <- cbind("\\hspace{1.1em}$A$" = rep(as.character(u), length(k2)), m)
@@ -282,20 +285,23 @@ m[2, ] <- iprior::dec_plac(tmp[2, ], 1)
 m[3:7, ] <- round(tmp[3:7, ])
 
 # k2 = 2
-m[8:9, ]   <- iprior::dec_plac(tmp[8:9, ], 2)
-m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 1)
+m[8:9, ]   <- iprior::dec_plac(tmp[8:9, ], 3)
+m[10:14, ] <- iprior::dec_plac(tmp[10:14, ], 2)
 
 # k2 = 3
-m[15:17, ] <- iprior::dec_plac(tmp[15:17, ], 2)
-m[18:21, ] <- iprior::dec_plac(tmp[18:21, ], 1)
+m[15:17, ] <- iprior::dec_plac(tmp[15:17, ], 3)
+m[18:19, ] <- iprior::dec_plac(tmp[18:19, ], 2)
+m[20:21, ] <- iprior::dec_plac(tmp[20:21, ], 1)
 
 # k2 = 4
-m[22:23, ] <- iprior::dec_plac(tmp[22:23, ], 2)
-m[24:28, ] <- iprior::dec_plac(tmp[24:28, ], 1)
+m[22, ] <- iprior::dec_plac(tmp[22, ], 3)
+m[23:25, ] <- iprior::dec_plac(tmp[23:25, ], 2)
+m[26:28, ] <- iprior::dec_plac(tmp[26:28, ], 1)
 
 # k2 = 5
-m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 2)
-m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 1)
+m[29, ] <- iprior::dec_plac(tmp[29, ], 3)
+m[30:32, ] <- iprior::dec_plac(tmp[30:32, ], 2)
+m[33:35, ] <- iprior::dec_plac(tmp[33:35, ], 1)
 
 colnames(m) <- k1
 colnames(m)[10] <- "$\\infty$"
@@ -610,8 +616,8 @@ m[22:23, ] <- iprior::dec_plac(tmp[22:23, ], 3)
 m[24:28, ] <- iprior::dec_plac(tmp[24:28, ], 2)
 
 # k2 = 10
-m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 3)
-m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 2)
+m[29:30, ] <- iprior::dec_plac(tmp[29:30, ], 4)
+m[31:35, ] <- iprior::dec_plac(tmp[31:35, ], 4)
 
 colnames(m) <- k1
 colnames(m)[10] <- "$\\infty$"
