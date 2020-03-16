@@ -1,1 +1,5 @@
 theme: jekyll-theme-cayman
+title: Statistical Tables
+show_downloads: true
+description: |
+  An open source PDF format of statistical tables for use in examinations, tests, assignments, and so on.
