@@ -1,6 +1,6 @@
 # Statistical Tables
 
-This document contains probability and percentile tables for commonly used statistical distributions, including the standard normal, $\chi^2$, Student's $t$ and $F$ distributions, for use in statistical inference and applied probability problems. These tables should be especially useful for students in statistics to use in examinations, tests, assignments, and so on.
+This document contains probability and percentile tables of commonly used statistical distributions, including the standard normal, chi-square, Student's t and F distributions, for use in statistical inference and applied probability problems. These tables should be especially useful for students in statistics to use in examinations, tests, assignments, and so on.
 
 # Changelog
 
