@@ -1,5 +1,5 @@
-theme: jekyll-theme-cayman
-# remote_theme: tuur29/pages-themes-cayman
+# theme: jekyll-theme-cayman
+remote_theme: tuur29/pages-themes-cayman
 title: Statistical Tables
 show_downloads: true
 # github:
