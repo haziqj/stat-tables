@@ -1,7 +1,15 @@
 theme: jekyll-theme-cayman
+# remote_theme: tuur29/pages-themes-cayman
 title: Statistical Tables
 show_downloads: true
-github:
-  zip_url: https://github.com/haziqj/stat-tables/releases/download/v0.2/stat-tables.pdf
+# github:
+#   zip_url: https://github.com/haziqj/stat-tables/releases/download/v0.2/stat-tables.pdf
+buttons:
+  zip_url: https://github.com/tuur29/pages-themes-cayman
+  zip_title: Download PDF
+  zip_hide: true
+  tar_hide: true
+  github_hide: false  
 description: |
   An open source PDF format of statistical tables for use in examinations, tests, assignments, and so on.
+  
